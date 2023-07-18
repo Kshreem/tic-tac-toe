@@ -1,0 +1,112 @@
+def   Constboard(board):
+    print("Current state of board: \n\n");
+  #now we have to print the board like
+ # 123 i%3==0 but i should be greater than 3
+ # 456
+ # 789
+    for i in range(0,9):
+         if((i>0) and (i%3==0)):
+             print("\n");
+         if(board [i]==0):
+             print(" _ ", end=" ");
+         if(board [i]==-1):
+             print(" X ", end=" ");
+         if(board [i]==1):
+             print(" O ", end=" ");
+    print("\n\n");
+
+def User1turn(board):
+  pos=input("Enter X position from [1,2,3.....9]");
+  pos=int(pos);
+  if(board[pos-1]!=0):   #if place is not empty
+    print("Wrong move");
+    exit(0);
+  board[pos-1]=-1;
+
+def User2turn(board):
+  pos=input("Enter O position from [1,2,3.....9]");
+  pos=int(pos);
+  if(board[pos-1]!=0):   #if place is not empty
+    print("Wrong move");
+    exit(0);
+  board[pos-1]=1;
+
+def minmax(board,player):   #recursion calling function again and again
+  x=Analyzeboard(board);
+  if(x!=0):
+    return(x*player);
+  pos=-1;
+  value=-2;
+  for i in range (0,9):
+    if(board[i]==0):
+      board[i]=player;
+      score=-minmax(board, player*-1);
+      board[i]=0;
+      if(score>value):
+        value=score;
+        pos=i;
+  if(pos==-1):
+     return 0;
+  return value;
+
+def Compturn(board):
+  pos=-1;
+  value=-2;
+  for i in range (0,9):
+    if(board[i]==0):
+      board[i]=1;
+      score=-minmax(board , -1);
+      board[i]=0;
+      if(score>value):
+        value=score;
+        pos=i;
+  board[pos]=1
+
+#now we define analyzeboard function to find the list has same value to win like XXX or OOO ,
+#the cases which can have similar value for possibility to win
+# either horizontally vertically or diagonally
+def Analyzeboard(board):
+  cb=[ [0,1,2], [3,4,5], [6,7,8] ,[0,3,6] ,[1,4,7], [2,5,8], [0,4,8], [2,4,6] ];
+  for i in range(0,8):
+    if( board[cb[i][0]]!=0  and  board[cb[i][0]]==board[cb[i][1]]  and  board[cb[i][0]]==board[cb[i][2]] ):
+     return board[cb[i][0]];
+  return 0;
+
+def main():
+  choice=input("Enter 1 for single player and 2 for multiplayer: ");
+  choice=int(choice);
+  board=[0, 0, 0, 0, 0, 0, 0, 0, 0];
+  if(choice==1):     #for singleplayer
+       print("Computer: O  vs  You: X ");
+       player=input("Enter to play 1st or 2nd:");
+       player=int(player);
+       for i in range (0,9):
+          if(Analyzeboard(board)!=0):    #this means somebody has won
+              break;
+             # 1H, 2AI, 3H, 4AI..........
+          if((i+player)%2==0):   # i.e. (0+1)%2 !=0, then player turn otherwise compturn as it is written
+             Compturn(board);
+          else:
+              Constboard(board);  #display current state of board
+              User1turn(board);
+  else:                      # for choice==2 multiplayer
+     for i in range(0,9):
+        if(Analyzeboard(board)!=0):      #this means somebody has won
+             break;
+        if(i%2==0):   # as any player can play 1st or 2nd
+             Constboard(board);
+             User1turn(board);
+        else:
+              Constboard(board);  #display current state of board
+              User2turn(board);
+
+  x=Analyzeboard(board);   #display final value/final result of board
+  if(x==0):
+      Constboard(board);
+      print("Draw!!");
+  if(x==-1):
+      Constboard(board);
+      print("Player X wins and O losses");
+  if(x==1):
+      Constboard(board);
+      print("Player O wins and X losses");
